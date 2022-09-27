@@ -1,5 +1,4 @@
-import numpy as np
-from scipy.interpolate import interp1d
+from Similarity_Service import similiar_check_service
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -7,7 +6,6 @@ from email.mime.text import MIMEText
 # RUN ON HEROKU IT WILL TAKE 32 HOURS
 
 class backtester:
-
    array = ['EUR/USD', 'EUR/JPY', 'USD/JPY']
    year = 2018
    total_correct = 0
@@ -15,14 +13,12 @@ class backtester:
    shares = 100
    bank = 0
    for s in range(0,3):
-
       Cur, Ex_cur = array[s].split('/')
       name_pred =  ((Cur + Ex_cur) + '_2018.txt')
       f = open(name_pred, 'r').read()
       lines = f.split('\n')
       length = len(lines)
       pred_a = []
-
       for i in range(1, length):
          if len(lines[i]) > 0:
             x, y, z = lines[i].split(' ')
@@ -35,17 +31,11 @@ class backtester:
             pred_close_price.append(float(e))
       currency = []
       future_real = []
-
-
       count = 0
-      for i in range(0, len(pred_a)-13):
-            
+      for i in range(0, len(pred_a)-13):         
          count = count + 1
-         print(count)
-         
          if len(currency) > 0:
-            currency = []
-         
+            currency = []      
          if len(future_real) > 0:
             future_real = []
          for j in range(0, 10):
@@ -53,16 +43,13 @@ class backtester:
          
          for j in range(11, 13):
             future_real.append(pred_close_price[i+j])
-
          name = (Cur + Ex_cur + '_Simulation.txt')
+         
          def test(currency, name):
             f = open(name, 'r').read()
             lines = f.split('\n')
             leg = len(lines)
-               
-            
-            z_arr = []
-               
+            z_arr = []            
             for i in range(1, leg):
                if len(lines[i]) > 0:
                   x, y, z = lines[i].split(' ')
@@ -71,8 +58,7 @@ class backtester:
             e_arr = []
             leg = len(z_arr)
             Historic = []
-               
-               
+   
             for i in range(0, leg):
                if len(z_arr[i]) > 1:
                   a, b, c, d, e, f = z_arr[i].split(',')
@@ -91,38 +77,14 @@ class backtester:
                for j in range(11, 13):
                   future.append(e_arr[i + j])
                      
-               def similiar(currency, compare):
-
-                  x = np.linspace(0, 9, num=10)
-                  x2 = np.linspace(0, 9, num=10)
-                     
-                  same = False
-                     
-                  f = interp1d(x, currency)
-                  f2 = interp1d(x2, compare)
-                  points = 15
-                  xnew = np.linspace ( min(x), max(x), num = points)
-                  xnew2 = np.linspace ( min(x2), max(x2), num = points)
-                  ynew = f(xnew)
-                  ynew2 = f2(xnew2)
-                     
-                  sim = (np.corrcoef(ynew, ynew2)) 
-                  
-                  similarity = str(sim[0][1])
-                  similarity = float(similarity)
-                  
-                     
-                  if (similarity >= 0.90):
-                     same = True
-                     
-                  return same
-                     
-               same = similiar(currency, compare)   
+               
+               srv = similiar_check_service()      
+               same = srv.similiar(currency, compare)   
                if same == True:
                   Historic.append(future)
                
             if (len(Historic)) > 0:
-                  return Historic
+               return Historic
                   
                   
             elif (len(Historic)) == 0:
@@ -196,9 +158,9 @@ class backtester:
    server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
    server.login("#############", "############")
    server.sendmail(
-      "###############", 
-      "###############", 
-      text)
+         "###############", 
+         "###############", 
+         text)
    server.quit()
    print('This is the number of total correct: ' ,total_correct)
    print('This is the number of total incorrect: ', total_incorrect)
