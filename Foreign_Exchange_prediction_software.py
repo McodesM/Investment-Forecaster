@@ -13,7 +13,7 @@ from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from Similarity_Service import similiar_check_service
+from Similarity_Service import similiar
 
 class forex:
     def __init__ (self, currency, ex_currency):
@@ -26,7 +26,7 @@ class forex:
        data = con.get_candles(pair, period = 'H4', number = 60)
        return(data)
 
-class Forex_Pred:
+def Forex_Pred():
     window = Tk()
     window.title("Forex Pred software")
     window.geometry("450x200")
@@ -302,9 +302,7 @@ class Forex_Pred:
                             for j in range(61, 67):
                                 future.append(b_arr[i + j])
 
-                       
-                            srv = similiar_check_service()
-                            same = srv.similiar(currency, compare, 59, 60, 0.95)   
+                            same = similiar(currency, compare, 59, 60, 0.95)   
                             if same == True:
                                 Historic.append(future)
                         if (len(Historic)) > 0:
@@ -410,3 +408,6 @@ class Forex_Pred:
         btn4.place(x = 0 , y = 140)
     Forex_prediction()
     window.mainloop()
+
+if __name__ == '__main__':
+    Forex_Pred()

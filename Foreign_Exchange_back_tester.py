@@ -1,11 +1,11 @@
-from Similarity_Service import similiar_check_service
+from Similarity_Service import similiar
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 # RUN ON HEROKU IT WILL TAKE 32 HOURS
 
-class backtester:
+def backtester():
    array = ['EUR/USD', 'EUR/JPY', 'USD/JPY']
    year = 2018
    total_correct = 0
@@ -77,9 +77,7 @@ class backtester:
                for j in range(11, 13):
                   future.append(e_arr[i + j])
                      
-               
-               srv = similiar_check_service()      
-               same = srv.similiar(currency, compare)   
+               same = similiar(currency, compare, 9, 10, 0.90)   
                if same == True:
                   Historic.append(future)
                
@@ -125,11 +123,11 @@ class backtester:
                
             elif (gradient <= 0) and (pred_gradient <= 0):
                total_correct = total_correct + 1
-               print('correct prediction num: ' + total_correct)
+               print('correct prediction num: ' + str(total_correct))
 
             else:
                total_incorrect = total_incorrect + 1
-               print('Wrong prediction num:' + total_incorrect)
+               print('Wrong prediction num:' + str(total_incorrect))
             
             
             bank = bank + ((shares * future_real[1])-wallet)
@@ -164,3 +162,6 @@ class backtester:
    server.quit()
    print('This is the number of total correct: ' ,total_correct)
    print('This is the number of total incorrect: ', total_incorrect)
+
+if __name__ == '__main__':
+   backtester()
